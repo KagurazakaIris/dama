@@ -106,6 +106,10 @@ src/
 | Passport | `passport` | G12345678 |
 | License Plate | `licensePlate` | 京A12345 |
 
+### example 
+<img width="504" height="327" alt="image" src="https://github.com/user-attachments/assets/466cc04f-a23b-4643-b1ab-c5b8054c2aca" />
+
+
 ## CI/CD
 
 GitHub Actions builds on push to `master`:
