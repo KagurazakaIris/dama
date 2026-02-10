@@ -133,17 +133,20 @@ function render(): void {
     ctx.drawImage(image, 0, 0);
   }
 
-  // Draw enabled regions
+  // Draw enabled regions with solid black fill (matches actual output)
   for (const region of regions) {
     if (!region.enabled) continue;
 
     const isHighlighted = region.id === highlightedRegionId;
-    ctx.fillStyle = region.type === 'auto'
-      ? (isHighlighted ? 'rgba(66, 133, 244, 0.5)' : 'rgba(66, 133, 244, 0.3)')
-      : (isHighlighted ? 'rgba(244, 161, 66, 0.5)' : 'rgba(244, 161, 66, 0.3)');
+
+    // Solid black fill
+    ctx.fillStyle = '#000000';
     ctx.fillRect(region.x, region.y, region.width, region.height);
 
-    ctx.strokeStyle = region.type === 'auto' ? '#4285f4' : '#f4a142';
+    // Border
+    ctx.strokeStyle = region.type === 'auto'
+      ? (isHighlighted ? '#4285f4' : '#2a6bcc')
+      : (isHighlighted ? '#f4a142' : '#c8832e');
     ctx.lineWidth = 2 / viewScale;
     ctx.strokeRect(region.x, region.y, region.width, region.height);
   }
@@ -343,23 +346,14 @@ function renderRegionList(): void {
 }
 
 function setupBottomBar(): void {
-  const mosaicSlider = document.getElementById('mosaic-size') as HTMLInputElement;
-  const mosaicValue = document.getElementById('mosaic-value')!;
-
-  mosaicSlider.addEventListener('input', () => {
-    mosaicValue.textContent = mosaicSlider.value;
-  });
-
   document.getElementById('btn-clipboard')!.addEventListener('click', async () => {
-    const blockSize = parseInt(mosaicSlider.value);
     const enabledRegions = regions.filter(r => r.enabled);
-    await window.damaAPI.saveToClipboard(enabledRegions, blockSize);
+    await window.damaAPI.saveToClipboard(enabledRegions, 10);
   });
 
   document.getElementById('btn-save')!.addEventListener('click', async () => {
-    const blockSize = parseInt(mosaicSlider.value);
     const enabledRegions = regions.filter(r => r.enabled);
-    await window.damaAPI.saveToFile(enabledRegions, blockSize);
+    await window.damaAPI.saveToFile(enabledRegions, 10);
   });
 
   document.getElementById('btn-cancel')!.addEventListener('click', () => {

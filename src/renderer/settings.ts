@@ -19,15 +19,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   const autoCheckbox = document.getElementById('opt-auto') as HTMLInputElement;
   autoCheckbox.checked = settings.autoProcess;
 
-  // Mosaic slider
-  const mosaicSlider = document.getElementById('opt-mosaic') as HTMLInputElement;
-  const mosaicValue = document.getElementById('mosaic-value')!;
-  mosaicSlider.value = String(settings.mosaicBlockSize);
-  mosaicValue.textContent = String(settings.mosaicBlockSize);
-  mosaicSlider.addEventListener('input', () => {
-    mosaicValue.textContent = mosaicSlider.value;
-  });
-
   // Pattern list
   const patternList = document.getElementById('pattern-list')!;
   for (const [key, label] of Object.entries(PATTERN_LABELS)) {
@@ -68,7 +59,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     await window.damaAPI.saveSettings({
       monitorEnabled: monitorCheckbox.checked,
       autoProcess: autoCheckbox.checked,
-      mosaicBlockSize: parseInt(mosaicSlider.value),
+      mosaicBlockSize: 10,
       sensitivePatterns: patterns,
     });
     window.damaAPI.closeSettings();

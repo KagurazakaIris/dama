@@ -19,7 +19,9 @@ export class OcrBridge {
 
     return new Promise<void>((resolve, reject) => {
       const pythonScript = this.getPythonScriptPath();
-      this.process = spawn('python3', [pythonScript], {
+      const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+      console.log(`[OCR] Starting: ${pythonCmd} ${pythonScript}`);
+      this.process = spawn(pythonCmd, [pythonScript], {
         stdio: ['pipe', 'pipe', 'pipe'],
       });
 
