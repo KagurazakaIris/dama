@@ -1,11 +1,24 @@
-import sharp from 'sharp';
+import type Sharp from 'sharp';
 import type { MosaicRegion } from '../shared/types';
+
+// Lazy-load sharp so that native module DLL paths can be configured
+// before the native binding is loaded (critical on Windows).
+let _sharp: typeof Sharp | null = null;
+
+function getSharp(): typeof Sharp {
+  if (!_sharp) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    _sharp = require('sharp') as typeof Sharp;
+  }
+  return _sharp;
+}
 
 export async function applyMosaic(
   imagePath: string,
   regions: MosaicRegion[],
   blockSize = 10,
 ): Promise<Buffer> {
+  const sharp = getSharp();
   const enabledRegions = regions.filter(r => r.enabled);
   if (enabledRegions.length === 0) {
     return sharp(imagePath).png().toBuffer();
@@ -15,7 +28,7 @@ export async function applyMosaic(
   const imgWidth = metadata.width!;
   const imgHeight = metadata.height!;
 
-  const composites: sharp.OverlayOptions[] = [];
+  const composites: Sharp.OverlayOptions[] = [];
 
   for (const region of enabledRegions) {
     // Clamp region to image bounds

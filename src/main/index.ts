@@ -201,9 +201,27 @@ const trayCallbacks = {
   isMonitoring: () => monitoring,
 };
 
+// --- Native module setup ---
+// On Windows, add the libvips DLL directory to PATH so that sharp's
+// native binding can find libvips-42.dll and other dependencies.
+// Must run before sharp is loaded (sharp is lazy-loaded in mosaic-processor).
+function setupNativeModulePaths(): void {
+  if (process.platform !== 'win32' || !app.isPackaged) return;
+
+  const libvipsDir = path.join(
+    process.resourcesPath,
+    'app.asar.unpacked', 'node_modules', '@img',
+    'sharp-libvips-win32-x64', 'lib'
+  );
+  if (fs.existsSync(libvipsDir)) {
+    process.env.PATH = `${libvipsDir};${process.env.PATH}`;
+  }
+}
+
 // --- App lifecycle ---
 
 app.whenReady().then(() => {
+  setupNativeModulePaths();
   trayManager.create(trayCallbacks);
   clipboardMonitor.on('image-detected', handleImageDetected);
   clipboardMonitor.start(500);

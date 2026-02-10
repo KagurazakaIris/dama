@@ -29,7 +29,9 @@ const config: ForgeConfig = {
     icon: 'resources/icon',
     extraResource: ['python'],
     asar: {
-      unpack: '**/*.node',
+      // Unpack entire native module directories so that .node, .dll, .so, .dylib
+      // files are all on the real filesystem where the OS dynamic linker can load them.
+      unpackDir: '{node_modules/sharp,node_modules/@img}',
     },
   },
   hooks: {
@@ -38,15 +40,34 @@ const config: ForgeConfig = {
       const srcModules = path.join(projectRoot, 'node_modules');
       const destModules = path.join(buildPath, 'node_modules');
 
+      console.log('[forge hook] packageAfterPrune start');
+      console.log('[forge hook] projectRoot:', projectRoot);
+      console.log('[forge hook] buildPath:', buildPath);
+      console.log('[forge hook] srcModules exists:', fs.existsSync(srcModules));
+
       fs.mkdirSync(destModules, { recursive: true });
 
       for (const mod of NATIVE_MODULES) {
         const src = path.join(srcModules, mod);
         const dest = path.join(destModules, mod);
-        if (fs.existsSync(src)) {
+        const exists = fs.existsSync(src);
+        if (exists) {
           fs.cpSync(src, dest, { recursive: true });
+          console.log(`[forge hook] copied: ${mod}`);
+        } else {
+          console.warn(`[forge hook] MISSING: ${mod} (${src})`);
         }
       }
+
+      // Verify critical modules were copied
+      const sharpDest = path.join(destModules, 'sharp', 'package.json');
+      const imgDest = path.join(destModules, '@img');
+      console.log('[forge hook] sharp/package.json exists in dest:', fs.existsSync(sharpDest));
+      console.log('[forge hook] @img exists in dest:', fs.existsSync(imgDest));
+      if (fs.existsSync(imgDest)) {
+        console.log('[forge hook] @img contents:', fs.readdirSync(imgDest).join(', '));
+      }
+      console.log('[forge hook] packageAfterPrune done');
     },
   },
   makers: [
