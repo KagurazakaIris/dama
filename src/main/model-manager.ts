@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
-import { app, net } from 'electron';
+import https from 'https';
+import { app } from 'electron';
 
 interface ModelFile {
   filename: string;
@@ -47,7 +48,7 @@ export class ModelManager {
   async ensureModels(onProgress?: (msg: string) => void): Promise<void> {
     fs.mkdirSync(this.modelsDir, { recursive: true });
 
-    for (const [key, model] of Object.entries(MODEL_FILES)) {
+    for (const [, model] of Object.entries(MODEL_FILES)) {
       const dest = path.join(this.modelsDir, model.filename);
       if (fs.existsSync(dest)) {
         console.log(`[ModelManager] ${model.filename} already exists`);
@@ -65,22 +66,50 @@ export class ModelManager {
     onProgress?.('模型准备就绪');
   }
 
-  private async downloadFile(url: string, destPath: string): Promise<void> {
+  private downloadFile(url: string, destPath: string): Promise<void> {
     const tmpPath = destPath + '.tmp';
 
-    try {
-      const response = await net.fetch(url, { redirect: 'follow' });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} ${response.statusText} for ${url}`);
-      }
+    return new Promise<void>((resolve, reject) => {
+      const doRequest = (requestUrl: string, redirectCount: number): void => {
+        if (redirectCount > 5) {
+          reject(new Error('Too many redirects'));
+          return;
+        }
 
-      const buffer = await response.arrayBuffer();
-      fs.writeFileSync(tmpPath, Buffer.from(buffer));
-      fs.renameSync(tmpPath, destPath);
-    } catch (err) {
-      // Cleanup partial download
-      try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
-      throw err;
-    }
+        https.get(requestUrl, { headers: { 'User-Agent': 'Dama-Desktop/1.0' } }, (res) => {
+          // Follow redirects
+          if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+            console.log(`[ModelManager] Redirect ${res.statusCode} → ${res.headers.location.substring(0, 80)}...`);
+            doRequest(res.headers.location, redirectCount + 1);
+            return;
+          }
+
+          if (res.statusCode !== 200) {
+            reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+            return;
+          }
+
+          const ws = fs.createWriteStream(tmpPath);
+          res.pipe(ws);
+          ws.on('finish', () => {
+            try {
+              fs.renameSync(tmpPath, destPath);
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          });
+          ws.on('error', (err) => {
+            try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
+            reject(err);
+          });
+        }).on('error', (err) => {
+          try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
+          reject(err);
+        });
+      };
+
+      doRequest(url, 0);
+    });
   }
 }

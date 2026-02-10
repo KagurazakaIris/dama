@@ -61,10 +61,19 @@ async function processImage(tempPath: string, image: NativeImage): Promise<void>
 
   try {
     // Run OCR
+    console.log('[processImage] Running OCR on', tempPath);
     const ocrResults = await ocrEngine.recognize(tempPath);
+    console.log('[processImage] OCR found', ocrResults.length, 'text regions');
+    for (const r of ocrResults) {
+      console.log(`  [OCR] "${r.text}" (confidence: ${r.confidence.toFixed(3)}, bbox: ${r.bbox})`);
+    }
 
     // Detect sensitive info
     const sensitiveMatches = detectSensitive(ocrResults, settings.sensitivePatterns);
+    console.log('[processImage] Sensitive matches:', sensitiveMatches.length);
+    for (const m of sensitiveMatches) {
+      console.log(`  [Sensitive] ${m.patternName}: "${m.matchedText}"`);
+    }
 
     // Convert matches to regions
     const regions: MosaicRegion[] = sensitiveMatches.map((match, i) => ({

@@ -351,13 +351,8 @@ export class OcrEngine {
 
       // CTC: skip blank (0) and consecutive duplicates
       if (maxIdx !== 0 && maxIdx !== prevIdx) {
-        // Compute softmax probability for confidence
-        let expSum = 0;
-        for (let c = 0; c < numClasses; c++) {
-          expSum += Math.exp(logits[offset + c] - maxVal);
-        }
-        const prob = 1.0 / expSum;
-        scoreSum += prob;
+        // Model output is already post-softmax, so maxVal is the probability
+        scoreSum += maxVal;
         charCount++;
 
         // Map to character (index 0 = blank, so char = dict[maxIdx - 1])
