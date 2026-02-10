@@ -3,7 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { ClipboardMonitor } from './clipboard-monitor';
-import { OcrBridge } from './ocr-bridge';
+import { OcrEngine } from './ocr-engine';
+import { ModelManager } from './model-manager';
 import { detectSensitive } from './sensitive-detector';
 import { applyMosaic } from './mosaic-processor';
 import { WindowManager } from './window-manager';
@@ -12,7 +13,8 @@ import { getSettings, saveSettings } from './store';
 import type { MosaicRegion, PreviewData } from '../shared/types';
 
 const clipboardMonitor = new ClipboardMonitor();
-const ocrBridge = new OcrBridge();
+const modelManager = new ModelManager();
+const ocrEngine = new OcrEngine(modelManager);
 const windowManager = new WindowManager();
 const trayManager = new TrayManager();
 
@@ -59,7 +61,7 @@ async function processImage(tempPath: string, image: NativeImage): Promise<void>
 
   try {
     // Run OCR
-    const ocrResults = await ocrBridge.recognize(tempPath);
+    const ocrResults = await ocrEngine.recognize(tempPath);
 
     // Detect sensitive info
     const sensitiveMatches = detectSensitive(ocrResults, settings.sensitivePatterns);
@@ -194,7 +196,7 @@ const trayCallbacks = {
     windowManager.createSettingsWindow();
   },
   onQuit: () => {
-    ocrBridge.shutdown();
+    ocrEngine.shutdown();
     clipboardMonitor.stop();
     app.quit();
   },
@@ -238,7 +240,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
-  ocrBridge.shutdown();
+  ocrEngine.shutdown();
   clipboardMonitor.stop();
   trayManager.destroy();
 });

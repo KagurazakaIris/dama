@@ -20,6 +20,8 @@ const NATIVE_MODULES = [
   'is-arrayish',
   'detect-libc',
   'semver',
+  'onnxruntime-node',
+  'onnxruntime-common',
 ];
 
 const config: ForgeConfig = {
@@ -27,7 +29,6 @@ const config: ForgeConfig = {
     name: 'Dama Desktop',
     executableName: 'dama-desktop',
     icon: 'resources/icon',
-    extraResource: ['python'],
     asar: {
       // Unpack all native modules and their dependencies so that .node, .dll,
       // .so files are on the real filesystem where the OS dynamic linker can
@@ -68,6 +69,40 @@ const config: ForgeConfig = {
       if (fs.existsSync(imgDest)) {
         console.log('[forge hook] @img contents:', fs.readdirSync(imgDest).join(', '));
       }
+
+      // Strip non-current-platform binaries from onnxruntime-node to reduce size
+      const ortBinDir = path.join(destModules, 'onnxruntime-node', 'bin');
+      if (fs.existsSync(ortBinDir)) {
+        const plat = process.platform;
+        const arch = process.arch;
+        const walk = (dir: string, depth: number): void => {
+          if (depth > 3) return;
+          for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            if (!entry.isDirectory()) continue;
+            const full = path.join(dir, entry.name);
+            // At napi-v*/platform level: remove other platforms
+            if (depth === 1 && entry.name !== plat) {
+              fs.rmSync(full, { recursive: true });
+              console.log(`[forge hook] ort: removed ${entry.name} (not ${plat})`);
+              continue;
+            }
+            // At napi-v*/platform/arch level: remove other archs
+            if (depth === 2 && entry.name !== arch) {
+              fs.rmSync(full, { recursive: true });
+              console.log(`[forge hook] ort: removed ${plat}/${entry.name} (not ${arch})`);
+              continue;
+            }
+            walk(full, depth + 1);
+          }
+        };
+        walk(ortBinDir, 0);
+      }
+      // Remove install scripts (not needed at runtime)
+      const ortScriptDir = path.join(destModules, 'onnxruntime-node', 'script');
+      if (fs.existsSync(ortScriptDir)) {
+        fs.rmSync(ortScriptDir, { recursive: true });
+      }
+
       console.log('[forge hook] packageAfterPrune done');
     },
   },
