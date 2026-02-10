@@ -3,10 +3,13 @@ import { VitePlugin } from '@electron-forge/plugin-vite';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerRpm } from '@electron-forge/maker-rpm';
+import path from 'path';
+import fs from 'fs';
 
 // sharp and its transitive production dependencies.
-// Listed explicitly so devDependencies never leak into the package.
-const PRODUCTION_MODULES = [
+// Copied explicitly because the vite plugin's default ignore function
+// excludes node_modules (it assumes everything is bundled by vite).
+const NATIVE_MODULES = [
   'sharp',
   '@img',
   'color',
@@ -28,17 +31,22 @@ const config: ForgeConfig = {
     asar: {
       unpack: '**/*.node',
     },
-    // Override the vite plugin's default ignore function.
-    // The vite plugin only keeps .vite/ — we also need node_modules
-    // for native dependencies (sharp) that are externalized by vite.
-    ignore: (file: string) => {
-      if (!file) return false;
-      if (file.startsWith('/.vite')) return false;
-      if (file === '/package.json') return false;
-      for (const mod of PRODUCTION_MODULES) {
-        if (file.startsWith(`/node_modules/${mod}`)) return false;
+  },
+  hooks: {
+    packageAfterPrune: async (_forgeConfig, buildPath) => {
+      const projectRoot = process.cwd();
+      const srcModules = path.join(projectRoot, 'node_modules');
+      const destModules = path.join(buildPath, 'node_modules');
+
+      fs.mkdirSync(destModules, { recursive: true });
+
+      for (const mod of NATIVE_MODULES) {
+        const src = path.join(srcModules, mod);
+        const dest = path.join(destModules, mod);
+        if (fs.existsSync(src)) {
+          fs.cpSync(src, dest, { recursive: true });
+        }
       }
-      return true;
     },
   },
   makers: [

@@ -4,3 +4,5 @@ out/
 dist/
 *.pyc
 __pycache__/
+resources/icon.png
+resources/tray-icon.png
