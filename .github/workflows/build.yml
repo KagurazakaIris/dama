@@ -63,16 +63,17 @@ jobs:
 
       - name: Inspect build output
         if: always()
+        continue-on-error: true
         shell: bash
         run: |
           echo "=== Packaged app contents ==="
-          find out/ -name "app.asar" 2>/dev/null | while IFS= read -r f; do echo "ASAR: $f"; done
+          find out/ -name "app.asar" 2>/dev/null | while IFS= read -r f; do echo "ASAR: $f"; done || true
           find out/ -name "app.asar.unpacked" -type d 2>/dev/null | while IFS= read -r d; do
             echo "--- Unpacked contents of $d ---"
-            find "$d" -type f 2>/dev/null | head -50
-          done
-          find out/ -path "*/node_modules/sharp/package.json" 2>/dev/null | while IFS= read -r f; do echo "SHARP FOUND: $f"; done
-          find out/ -path "*/@img/*" -name "*.node" 2>/dev/null | while IFS= read -r f; do echo "NATIVE: $f"; done
+            find "$d" -type f 2>/dev/null | head -50 || true
+          done || true
+          find out/ -path "*/node_modules/sharp/package.json" 2>/dev/null | while IFS= read -r f; do echo "SHARP FOUND: $f"; done || true
+          find out/ -path "*/@img/*" -name "*.node" 2>/dev/null | while IFS= read -r f; do echo "NATIVE: $f"; done || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
