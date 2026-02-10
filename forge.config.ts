@@ -29,9 +29,10 @@ const config: ForgeConfig = {
     icon: 'resources/icon',
     extraResource: ['python'],
     asar: {
-      // Unpack entire native module directories so that .node, .dll, .so, .dylib
-      // files are all on the real filesystem where the OS dynamic linker can load them.
-      unpackDir: '{node_modules/sharp,node_modules/@img}',
+      // Unpack all native modules and their dependencies so that .node, .dll,
+      // .so files are on the real filesystem where the OS dynamic linker can
+      // load them, and JS dependencies can be resolved without cross-boundary issues.
+      unpackDir: 'node_modules',
     },
   },
   hooks: {

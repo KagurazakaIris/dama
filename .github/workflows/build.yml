@@ -62,19 +62,17 @@ jobs:
         run: npx electron-forge make --arch=${{ matrix.arch }}
 
       - name: Inspect build output
+        if: always()
         shell: bash
         run: |
           echo "=== Packaged app contents ==="
-          find out/ -name "app.asar" -exec echo "ASAR: {}" \; 2>/dev/null || true
-          find out/ -name "app.asar.unpacked" -type d -exec echo "UNPACKED DIR: {}" \; 2>/dev/null || true
-          # List unpacked contents if they exist
-          for d in $(find out/ -name "app.asar.unpacked" -type d 2>/dev/null); do
-            echo "--- Contents of $d ---"
-            find "$d" -type f | head -50
+          find out/ -name "app.asar" 2>/dev/null | while IFS= read -r f; do echo "ASAR: $f"; done
+          find out/ -name "app.asar.unpacked" -type d 2>/dev/null | while IFS= read -r d; do
+            echo "--- Unpacked contents of $d ---"
+            find "$d" -type f 2>/dev/null | head -50
           done
-          # Check if sharp exists in the packaged app
-          find out/ -path "*/node_modules/sharp/package.json" -exec echo "SHARP FOUND: {}" \; 2>/dev/null || echo "SHARP NOT FOUND in output"
-          find out/ -path "*/@img/*" -name "*.node" -exec echo "NATIVE: {}" \; 2>/dev/null || echo "NO NATIVE .node files found"
+          find out/ -path "*/node_modules/sharp/package.json" 2>/dev/null | while IFS= read -r f; do echo "SHARP FOUND: $f"; done
+          find out/ -path "*/@img/*" -name "*.node" 2>/dev/null | while IFS= read -r f; do echo "NATIVE: $f"; done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
