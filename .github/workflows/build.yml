@@ -53,7 +53,8 @@ jobs:
         run: node -e "const s = require('sharp'); console.log('sharp OK'); const p = require('./node_modules/sharp/lib/libvips').runtimePlatformArch(); console.log('platform:', p); const fs = require('fs'); const imgDir = './node_modules/@img'; if(fs.existsSync(imgDir)) { console.log('@img contents:', fs.readdirSync(imgDir)); } else { console.log('@img NOT FOUND'); }"
 
       - name: Verify onnxruntime-node installation
-        run: node -e "const ort = require('onnxruntime-node'); console.log('onnxruntime-node OK'); console.log('backends:', ort.listSupportedBackends ? ort.listSupportedBackends() : 'N/A');"
+        run: |
+          node -e "const ort = require('onnxruntime-node'); console.log('onnxruntime-node OK'); console.log('backends:', ort.listSupportedBackends ? ort.listSupportedBackends() : 'N/A');"
 
       - name: Generate tray icon
         run: npm run generate-icon
