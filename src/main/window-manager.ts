@@ -151,7 +151,7 @@ export class WindowManager {
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
       win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/src/renderer/${page}.html`);
     } else {
-      win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/${page}.html`));
+      win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/src/renderer/${page}.html`));
     }
   }
 }
