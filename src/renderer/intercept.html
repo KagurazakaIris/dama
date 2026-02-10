@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;">
+  <title>Dama - 检测到图片</title>
+  <link rel="stylesheet" href="./intercept.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="title">检测到剪贴板图片</span>
+    </div>
+    <div class="preview">
+      <img id="thumbnail" alt="预览" />
+    </div>
+    <div class="actions">
+      <button id="btn-mosaic" class="btn btn-primary">自动打码</button>
+      <button id="btn-skip" class="btn btn-secondary">跳过</button>
+    </div>
+    <div class="timer">
+      <span id="countdown">10</span>秒后自动跳过
+    </div>
+  </div>
+  <script type="module" src="./intercept.ts"></script>
+</body>
+</html>

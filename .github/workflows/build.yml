@@ -1,0 +1,95 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            arch: x64
+            artifact_name: win-x64
+          - os: macos-latest
+            arch: arm64
+            artifact_name: mac-arm64
+          - os: ubuntu-latest
+            arch: x64
+            artifact_name: linux-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Linux: install packaging tools for deb/rpm makers
+      - name: Install Linux packaging dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg fakeroot rpm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Generate tray icon
+        run: npm run generate-icon
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build packages
+        run: npx electron-forge make --arch=${{ matrix.arch }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dama-desktop-${{ matrix.artifact_name }}
+          path: |
+            out/make/**/*.zip
+            out/make/**/*.deb
+            out/make/**/*.rpm
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect release files
+        run: |
+          mkdir -p release
+          find artifacts -type f \( -name "*.zip" -o -name "*.deb" -o -name "*.rpm" \) -exec cp {} release/ \;
+          echo "=== Release files ==="
+          ls -lh release/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true

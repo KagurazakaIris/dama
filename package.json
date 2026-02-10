@@ -1,0 +1,28 @@
+{
+  "name": "dama-desktop",
+  "version": "1.0.0",
+  "description": "Clipboard privacy protection tool - 剪贴板隐私保护",
+  "main": ".vite/build/index.js",
+  "author": "Dama Desktop Contributors",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "typecheck": "tsc --noEmit",
+    "generate-icon": "node scripts/generate-icon.mjs"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.6.0",
+    "@electron-forge/maker-deb": "^7.6.0",
+    "@electron-forge/maker-rpm": "^7.6.0",
+    "@electron-forge/maker-zip": "^7.6.0",
+    "@electron-forge/plugin-vite": "^7.6.0",
+    "electron": "^34.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "sharp": "^0.33.0"
+  }
+}

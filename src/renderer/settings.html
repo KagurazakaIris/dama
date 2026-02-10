@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self';">
+  <title>Dama - 设置</title>
+  <link rel="stylesheet" href="./settings.css">
+</head>
+<body>
+  <div class="container">
+    <h2>设置</h2>
+
+    <div class="section">
+      <div class="setting-row">
+        <span>启用剪贴板监控</span>
+        <label class="switch">
+          <input type="checkbox" id="opt-monitor" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <span>自动处理模式</span>
+        <label class="switch">
+          <input type="checkbox" id="opt-auto" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <p class="hint">开启后跳过拦截弹窗，直接进入打码预览</p>
+    </div>
+
+    <div class="section">
+      <h3>马赛克强度</h3>
+      <div class="slider-row">
+        <input type="range" id="opt-mosaic" min="5" max="30" value="10" />
+        <span id="mosaic-value">10</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>敏感信息类型</h3>
+      <div id="pattern-list"></div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-save" class="btn btn-primary">保存</button>
+      <button id="btn-close" class="btn btn-secondary">关闭</button>
+    </div>
+  </div>
+
+  <script type="module" src="./settings.ts"></script>
+</body>
+</html>

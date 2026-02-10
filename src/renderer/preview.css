@@ -1,0 +1,256 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Left Toolbar */
+.toolbar {
+  width: 48px;
+  background: #16162a;
+  border-right: 1px solid #2a2a4a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  gap: 4px;
+}
+
+.tool-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #888;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.tool-btn:hover {
+  background: #2a2a4a;
+  color: #ccc;
+}
+
+.tool-btn.active {
+  background: #4285f4;
+  color: white;
+}
+
+.tool-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.tool-btn:disabled:hover {
+  background: transparent;
+  color: #888;
+}
+
+.toolbar-sep {
+  width: 28px;
+  height: 1px;
+  background: #2a2a4a;
+  margin: 4px 0;
+}
+
+/* Canvas Area */
+.canvas-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  cursor: crosshair;
+  background: #0f0f23;
+}
+
+#canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Right Panel */
+.panel {
+  width: 250px;
+  background: #16162a;
+  border-left: 1px solid #2a2a4a;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  padding: 12px;
+  border-bottom: 1px solid #2a2a4a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.small-btn {
+  padding: 2px 8px;
+  border: 1px solid #3a3a5a;
+  background: transparent;
+  color: #aaa;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.small-btn:hover {
+  background: #2a2a4a;
+  color: #ddd;
+}
+
+.region-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.region-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 4px;
+}
+
+.region-item:hover {
+  background: #2a2a4a;
+}
+
+.region-item.highlighted {
+  background: #2a2a5a;
+}
+
+.region-item input[type="checkbox"] {
+  accent-color: #4285f4;
+  flex-shrink: 0;
+}
+
+.region-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.region-tag.auto {
+  background: #4285f4;
+  color: white;
+}
+
+.region-tag.manual {
+  background: #f4a142;
+  color: white;
+}
+
+.region-label {
+  font-size: 12px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Bottom Bar */
+.bottom-bar {
+  background: #16162a;
+  border-top: 1px solid #2a2a4a;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mosaic-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.mosaic-control input[type="range"] {
+  width: 120px;
+  accent-color: #4285f4;
+}
+
+.bottom-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn-primary {
+  background: #4285f4;
+  color: white;
+}
+
+.btn-secondary {
+  background: #333;
+  color: #ccc;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: #888;
+  border: 1px solid #3a3a5a;
+}
+
+/* Scrollbar */
+.region-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.region-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.region-list::-webkit-scrollbar-thumb {
+  background: #3a3a5a;
+  border-radius: 3px;
+}

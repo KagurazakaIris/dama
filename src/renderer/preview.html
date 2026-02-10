@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;">
+  <title>Dama - 打码预览</title>
+  <link rel="stylesheet" href="./preview.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Left Toolbar -->
+    <div class="toolbar">
+      <button id="tool-select" class="tool-btn active" title="矩形选框 (R)">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="14" height="14" rx="1" stroke-dasharray="3 2"/>
+        </svg>
+      </button>
+      <div class="toolbar-sep"></div>
+      <button id="tool-undo" class="tool-btn" title="撤销 (Ctrl+Z)" disabled>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 8l4-4M4 8l4 4M4 8h9a4 4 0 0 1 0 8H10"/>
+        </svg>
+      </button>
+      <button id="tool-redo" class="tool-btn" title="重做 (Ctrl+Shift+Z)" disabled>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M16 8l-4-4M16 8l-4 4M16 8H7a4 4 0 0 0 0 8h3"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="canvas-container" id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>检测区域</span>
+        <div class="panel-actions">
+          <button id="btn-select-all" class="small-btn">全选</button>
+          <button id="btn-select-none" class="small-btn">全不选</button>
+        </div>
+      </div>
+      <div class="region-list" id="region-list"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="mosaic-control">
+      <label>马赛克强度:</label>
+      <input type="range" id="mosaic-size" min="5" max="30" value="10" />
+      <span id="mosaic-value">10</span>
+    </div>
+    <div class="bottom-actions">
+      <button id="btn-clipboard" class="btn btn-primary">应用到剪贴板</button>
+      <button id="btn-save" class="btn btn-secondary">另存为...</button>
+      <button id="btn-cancel" class="btn btn-cancel">取消</button>
+    </div>
+  </div>
+
+  <script type="module" src="./preview.ts"></script>
+</body>
+</html>

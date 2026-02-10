@@ -1,0 +1,9 @@
+appId: com.dama.desktop
+productName: Dama Desktop
+directories:
+  output: out
+files:
+  - "!python/**/*"
+extraResources:
+  - from: python
+    to: python
